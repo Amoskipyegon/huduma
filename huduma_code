@@ -1,0 +1,35 @@
+import from byllm.llm { Model }
+
+# Initialize the LLM (Gemini)
+glob llm = Model(model_name="gemini/gemini-2.5-flash");
+architype Service {
+    has name: str;
+    has description: str;
+    has steps: list;
+}
+
+architype Citizen {
+    has name: str;
+    has query: str;
+}
+walker HudumaAgent {
+    can handle_query;
+
+    def handle_query() {
+        if here.type == "Citizen" {
+            print("👋 Hello " + here.name + "! I’m your Huduma Kenya AI Assistant.");
+
+            # Send query to Gemini LLM
+            response = llm.chat(messages=[
+                {"role": "system", "content": "You are a Huduma Kenya assistant. Help citizens access government services like ID, Passport, NHIF, NSSF, birth certificates, and driving licenses."},
+                {"role": "user", "content": here.query}
+            ]);
+
+            # Print LLM response
+            print("🤖 Huduma AI: " + response["content"]);
+        }
+    }
+}
+#  a citizen asking about an ID renewal
+Citizen(name="Amos", query="How do I renew my Kenyan ID?");
+      
